@@ -63,29 +63,30 @@ export async function searchTenders({ keywords = [], countries = [], cpvCodes = 
 }
 
 function buildTqlQuery({ keywords, countries, cpvCodes, cutoff }) {
+    // TED TQL syntax: TD=[2,3] AND PD>=[20250101]
+    // Array syntax uses brackets: TD=[2,3] not (TD=2 OR TD=3)
+    
     const parts = [];
 
-    // Date filter — published since cutoff
-    parts.push(`PD>=${cutoff}`);
+    // Date filter — published since cutoff (YYYYMMDD format)
+    parts.push(`PD>=[${cutoff}]`);
     
-    // DEBUG: Minimal query - comment out other filters for testing
-    log.info(`DEBUG: Using minimal query with only date filter (cutoff: ${cutoff})`);
+    // Notice type: contract notices only (TD=[2,3] format)
+    parts.push(`TD=[${CONTRACT_NOTICE_TYPES.join(',')}]`);
+    
+    log.info(`DEBUG: Minimal query - date + notice type only (cutoff: ${cutoff})`);
     
     /*
-    // Notice type: contract notices only (TD=2 OR TD=3)
-    const tdFilter = CONTRACT_NOTICE_TYPES.map(t => `TD=${t}`).join(' OR ');
-    parts.push(`(${tdFilter})`);
-
     // Country filter
     if (countries.length > 0) {
-        const cyFilter = countries.map(c => `CY=${c.toUpperCase()}`).join(' OR ');
-        parts.push(`(${cyFilter})`);
+        const cyList = countries.map(c => c.toUpperCase()).join(',');
+        parts.push(`CY=[${cyList}]`);
     }
 
     // CPV code filter
     if (cpvCodes.length > 0) {
-        const pcFilter = cpvCodes.map(c => `PC=${c}`).join(' OR ');
-        parts.push(`(${pcFilter})`);
+        const pcList = cpvCodes.join(',');
+        parts.push(`PC=[${pcList}]`);
     }
 
     // Keyword filter — search in title
