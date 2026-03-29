@@ -48,7 +48,14 @@ export async function searchTenders({ keywords = [], countries = [], cpvCodes = 
     }
 
     const data = await res.json();
+    
+    // DEBUG: Log raw API response structure
+    log.info('TED raw response:', JSON.stringify(data, null, 2));
+    log.info(`Response keys: ${Object.keys(data).join(', ')}`);
+    log.info(`Total count field: ${data.totalCount ?? data.total ?? data.count ?? 'N/A'}`);
+    
     const notices = data.notices ?? data.results ?? [];
+    log.info(`Notices array length: ${notices.length}`);
 
     const tenders = notices.slice(0, maxResults).map(normalizeTender);
     log.info(`Found ${tenders.length} tenders`);
@@ -60,7 +67,11 @@ function buildTqlQuery({ keywords, countries, cpvCodes, cutoff }) {
 
     // Date filter — published since cutoff
     parts.push(`PD>=${cutoff}`);
-
+    
+    // DEBUG: Minimal query - comment out other filters for testing
+    log.info(`DEBUG: Using minimal query with only date filter (cutoff: ${cutoff})`);
+    
+    /*
     // Notice type: contract notices only (TD=2 OR TD=3)
     const tdFilter = CONTRACT_NOTICE_TYPES.map(t => `TD=${t}`).join(' OR ');
     parts.push(`(${tdFilter})`);
@@ -82,6 +93,7 @@ function buildTqlQuery({ keywords, countries, cpvCodes, cutoff }) {
         const kwParts = keywords.map(kw => `TI~"${kw}"`);
         parts.push(`(${kwParts.join(' OR ')})`);
     }
+    */
 
     return parts.join(' AND ');
 }

@@ -31,8 +31,8 @@
         "days_back": {
             "title": "Days back",
             "type": "integer",
-            "description": "How many days back to look for new tenders. 7 = last week.",
-            "default": 7,
+            "description": "How many days back to look for new tenders. 30 = last month (testing with 2025 December data).",
+            "default": 30,
             "minimum": 1,
             "maximum": 90,
             "editor": "number"
