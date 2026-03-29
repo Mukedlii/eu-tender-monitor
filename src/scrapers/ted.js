@@ -100,11 +100,13 @@ function buildTqlQuery({ keywords, countries, cpvCodes, cutoff }) {
 }
 
 function normalizeTender(n) {
-    // TED API returns fields as arrays of objects with 'value'
+    // Extract simple field value (handles arrays and value objects)
     const get = (field) => {
         const v = n[field];
         if (!v) return null;
-        if (Array.isArray(v)) return v.map(x => x.value ?? x).filter(Boolean).join(', ');
+        if (Array.isArray(v)) {
+            return v.map(x => x.value ?? x).filter(Boolean).join(', ');
+        }
         return v.value ?? v;
     };
 
@@ -118,20 +120,39 @@ function normalizeTender(n) {
     }
     
     // Parse publication date (YYYYMMDD → ISO)
-    const pubDateRaw = get('PD');
     let publishedDate = null;
+    const pubDateRaw = n.PD; // Direct field access, not get()
     if (pubDateRaw) {
-        const dateStr = pubDateRaw.toString().replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
-        publishedDate = new Date(dateStr).toISOString();
+        try {
+            // Handle both string and number format
+            const dateStr = String(pubDateRaw).replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
+            const parsed = new Date(dateStr);
+            if (!isNaN(parsed.getTime())) {
+                publishedDate = parsed.toISOString();
+            }
+        } catch (err) {
+            log.warning(`Failed to parse date: ${pubDateRaw}`);
+        }
     }
     
-    const cpvRaw = n['PC'];
+    const cpvRaw = n.PC;
     const cpvCodes = Array.isArray(cpvRaw) ? cpvRaw.map(x => x.value ?? x).filter(Boolean) : [];
+    
+    // Extract country code
+    const countryRaw = n.CY;
+    let country = 'Unknown';
+    if (countryRaw) {
+        if (Array.isArray(countryRaw)) {
+            country = countryRaw[0]?.value ?? countryRaw[0] ?? 'Unknown';
+        } else {
+            country = countryRaw.value ?? countryRaw;
+        }
+    }
 
     return {
-        id:               `${noticeId}`,
+        id:               noticeId || 'N/A',
         title:            title,
-        country:          get('CY') || 'Unknown',
+        country:          country,
         publishedDate:    publishedDate,
         url:              noticeId ? `https://ted.europa.eu/en/notice/-/detail/${noticeId}` : null,
         // Optional metadata fields
