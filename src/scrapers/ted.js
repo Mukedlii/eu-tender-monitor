@@ -109,27 +109,36 @@ function normalizeTender(n) {
     };
 
     const noticeId = get('ND') ?? n.noticeNumber ?? null;
-    const pubDate  = get('PD') ?? n.publicationDate ?? null;
-    const cpvRaw   = n['PC'];
+    
+    // Extract title - prefer English, fallback to any language
+    const titleObj = n.TI;
+    let title = 'N/A';
+    if (titleObj && typeof titleObj === 'object') {
+        title = titleObj.eng || titleObj.fra || Object.values(titleObj)[0] || 'N/A';
+    }
+    
+    // Parse publication date (YYYYMMDD → ISO)
+    const pubDateRaw = get('PD');
+    let publishedDate = null;
+    if (pubDateRaw) {
+        const dateStr = pubDateRaw.toString().replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
+        publishedDate = new Date(dateStr).toISOString();
+    }
+    
+    const cpvRaw = n['PC'];
     const cpvCodes = Array.isArray(cpvRaw) ? cpvRaw.map(x => x.value ?? x).filter(Boolean) : [];
 
     return {
-        id:               `ted-${noticeId}`,
-        notice_id:        noticeId,
-        title:            get('TI') ?? null,
-        publication_date: pubDate,
+        id:               `${noticeId}`,
+        title:            title,
+        country:          get('CY') || 'Unknown',
+        publishedDate:    publishedDate,
+        url:              noticeId ? `https://ted.europa.eu/en/notice/-/detail/${noticeId}` : null,
+        // Optional metadata fields
         deadline:         get('DT') ?? null,
-        notice_type:      get('TD') ?? null,
         buyer_name:       get('AU') ?? null,
-        country:          get('CY') ?? null,
-        region:           get('RC') ?? null,
         cpv_codes:        cpvCodes.slice(0, 5),
         cpv_description:  cpvCodes[0] ? cpvCodeDescription(cpvCodes[0]) : null,
-        contract_nature:  get('NC') ?? null,
-        procedure_type:   get('PR') ?? null,
-        award_criteria:   get('AC') ?? null,
-        oj_supplement:    get('OJ_S') ?? null,
-        ted_url:          noticeId ? `https://ted.europa.eu/en/notice/-/detail/${noticeId}` : null,
         scraped_at:       new Date().toISOString(),
     };
 }
