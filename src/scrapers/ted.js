@@ -149,6 +149,10 @@ function normalizeTender(n) {
         }
     }
 
+    // Extract buyer_name as plain string (not object or array)
+    const buyerObj = n.AU || {};
+    const buyerName = buyerObj.eng?.[0] || buyerObj.fra?.[0] || buyerObj.deu?.[0] || Object.values(buyerObj)[0]?.[0] || 'Unknown';
+
     return {
         id:               noticeId || 'N/A',
         title:            title,
@@ -157,7 +161,7 @@ function normalizeTender(n) {
         url:              noticeId ? `https://ted.europa.eu/en/notice/-/detail/${noticeId}` : null,
         // Optional metadata fields
         deadline:         get('DT') ?? null,
-        buyer_name:       get('AU') ?? null,
+        buyer_name:       buyerName,
         cpv_codes:        cpvCodes.slice(0, 5),
         cpv_description:  cpvCodes[0] ? cpvCodeDescription(cpvCodes[0]) : null,
         scraped_at:       new Date().toISOString(),
