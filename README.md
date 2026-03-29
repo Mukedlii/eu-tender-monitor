@@ -28,19 +28,19 @@ TED is the supplement to the Official Journal of the EU dedicated to European pu
 
 ```json
 {
-  "notice_id": "123456-2025",
+  "notice_id": "123456-2026",
   "title": "Software development services for public administration",
-  "publication_date": "20250415",
-  "deadline": "20250530",
-  "buyer_name": "Federal Ministry of Finance",
+  "publication_date": "2026-03-29T00:00:00.000Z",
+  "deadline": "2026-04-30T00:00:00.000Z",
+  "buyer_name": "Federal Ministry of Finance (extracted from primary language of the notice)",
   "country": "DE",
   "region": "Berlin",
   "cpv_codes": ["72000000", "72200000"],
   "cpv_description": "IT services",
   "notice_type": "Contract notice",
   "contract_nature": "Services",
-  "ted_url": "https://ted.europa.eu/en/notice/-/detail/123456-2025",
-  "scraped_at": "2025-04-15T08:00:00.000Z"
+  "ted_url": "https://ted.europa.eu/en/notice/-/detail/123456-2026",
+  "scraped_at": "2026-03-29T08:00:00.000Z"
 }
 ```
 
@@ -96,6 +96,7 @@ Pay-per-result.
 
 | Volume | Est. cost |
 |---|---|
+| Actor start | $0.005 per run |
 | 50 tenders | ~$0.15 |
 | 200 tenders | ~$0.60 |
 | 500 tenders | ~$1.50 |
