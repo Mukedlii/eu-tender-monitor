@@ -1,0 +1,19 @@
+{
+    "name": "eu-tender-monitor",
+    "version": "1.0.0",
+    "description": "Apify Actor: EU Tender Monitor — track new European public procurement notices from TED (Tenders Electronic Daily) with keyword, country and CPV code filters",
+    "main": "src/main.js",
+    "type": "module",
+    "scripts": {
+        "start": "node src/main.js",
+        "start:dev": "apify run"
+    },
+    "dependencies": {
+        "apify": "^3.2.2",
+        "node-fetch": "^3.3.2"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "license": "Apache-2.0"
+}

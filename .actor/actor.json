@@ -1,0 +1,83 @@
+{
+    "actorSpecification": 1,
+    "name": "eu-tender-monitor",
+    "title": "EU Tender Monitor",
+    "description": "Monitor new EU public procurement tenders from TED (Tenders Electronic Daily). Filter by keyword, country or CPV code. Never miss a relevant contract opportunity.",
+    "version": "1.0",
+    "buildTag": "latest",
+    "dockerfile": "./Dockerfile",
+    "readme": "./README.md",
+    "input": "./input_schema.json",
+    "chargingEvents": [
+        {
+            "eventName": "apify-actor-start",
+            "title": "Actor Start",
+            "price": 0.002
+        },
+        {
+            "eventName": "result",
+            "title": "Tender result",
+            "price": 0.003
+        }
+    ],
+    "storages": {
+        "dataset": {
+            "actorSpecification": 1,
+            "fields": {},
+            "views": {
+                "overview": {
+                    "title": "Tender overview",
+                    "transformation": {
+                        "fields": [
+                            "notice_id",
+                            "title",
+                            "buyer_name",
+                            "country",
+                            "publication_date",
+                            "deadline",
+                            "cpv_codes",
+                            "ted_url"
+                        ]
+                    },
+                    "display": {
+                        "component": "table",
+                        "properties": {
+                            "notice_id": {
+                                "label": "Notice ID",
+                                "format": "text"
+                            },
+                            "title": {
+                                "label": "Title",
+                                "format": "text"
+                            },
+                            "buyer_name": {
+                                "label": "Buyer",
+                                "format": "text"
+                            },
+                            "country": {
+                                "label": "Country",
+                                "format": "text"
+                            },
+                            "publication_date": {
+                                "label": "Published",
+                                "format": "date"
+                            },
+                            "deadline": {
+                                "label": "Deadline",
+                                "format": "date"
+                            },
+                            "cpv_codes": {
+                                "label": "CPV",
+                                "format": "text"
+                            },
+                            "ted_url": {
+                                "label": "TED Link",
+                                "format": "link"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

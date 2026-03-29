@@ -1,0 +1,77 @@
+{
+    "title": "EU Tender Monitor",
+    "description": "Monitor new EU public procurement notices from TED (Tenders Electronic Daily). Filter by keyword, country, CPV code or buyer. Get Telegram + webhook alerts on new tenders. No API key needed.",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "keywords": {
+            "title": "Keywords",
+            "type": "array",
+            "description": "Search for tenders containing these words in the title or description (e.g. 'software', 'construction', 'consulting').",
+            "editor": "stringList",
+            "default": [],
+            "example": ["software development", "IT consulting", "construction"]
+        },
+        "countries": {
+            "title": "Country codes",
+            "type": "array",
+            "description": "Filter by country ISO codes (e.g. DE=Germany, FR=France, HU=Hungary, PL=Poland). Leave empty for all EU countries.",
+            "editor": "stringList",
+            "default": [],
+            "example": ["DE", "FR", "HU", "PL", "RO"]
+        },
+        "cpv_codes": {
+            "title": "CPV codes",
+            "type": "array",
+            "description": "Common Procurement Vocabulary codes (e.g. '72000000' for IT services, '45000000' for construction). Leave empty to skip.",
+            "editor": "stringList",
+            "default": [],
+            "example": ["72000000", "45000000", "79000000"]
+        },
+        "days_back": {
+            "title": "Days back",
+            "type": "integer",
+            "description": "How many days back to look for new tenders. 7 = last week.",
+            "default": 7,
+            "minimum": 1,
+            "maximum": 90,
+            "editor": "number"
+        },
+        "max_results": {
+            "title": "Max results",
+            "type": "integer",
+            "description": "Maximum number of tenders to return per run.",
+            "default": 100,
+            "minimum": 1,
+            "maximum": 500,
+            "editor": "number"
+        },
+        "delta_mode": {
+            "title": "Delta mode (only new tenders)",
+            "type": "boolean",
+            "description": "Only return tenders not seen in previous runs.",
+            "default": true,
+            "editor": "checkbox"
+        },
+        "telegram_bot_token": {
+            "title": "Telegram bot token",
+            "type": "string",
+            "description": "Bot token from @BotFather. Use Apify Secret e.g. @TELEGRAM_TOKEN.",
+            "editor": "textfield",
+            "isSecret": true
+        },
+        "telegram_chat_id": {
+            "title": "Telegram chat ID",
+            "type": "string",
+            "description": "Your Telegram chat or group ID from @userinfobot.",
+            "editor": "textfield"
+        },
+        "webhook_url": {
+            "title": "Webhook URL (optional)",
+            "type": "string",
+            "description": "POST results to Zapier, Make, n8n, Slack, etc.",
+            "editor": "textfield"
+        }
+    },
+    "required": []
+}
