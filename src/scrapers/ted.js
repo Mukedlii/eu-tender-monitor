@@ -20,8 +20,10 @@ const TED_API = 'https://api.ted.europa.eu/v3/notices/search';
 const CONTRACT_NOTICE_TYPES = [2, 3]; // contract notices + awards
 
 export async function searchTenders({ keywords = [], countries = [], cpvCodes = [], daysBack = 7, maxResults = 100 }) {
-    const cutoff = formatDate(new Date(Date.now() - daysBack * 24 * 60 * 60 * 1000));
-    log.info(`EU Tender Monitor: searching tenders since ${cutoff}`);
+    // DEBUG: Force 2025 December data (120 days back = ~Dec 1, 2025)
+    const debugDaysBack = 120;
+    const cutoff = formatDate(new Date(Date.now() - debugDaysBack * 24 * 60 * 60 * 1000));
+    log.info(`EU Tender Monitor: searching tenders since ${cutoff} (DEBUG: forced ${debugDaysBack} days back for 2025 data)`);
 
     const query = buildTqlQuery({ keywords, countries, cpvCodes, cutoff });
     log.info(`TQL query: ${query}`);
@@ -63,30 +65,28 @@ export async function searchTenders({ keywords = [], countries = [], cpvCodes = 
 }
 
 function buildTqlQuery({ keywords, countries, cpvCodes, cutoff }) {
-    // TED TQL syntax: TD=[2,3] AND PD>=[20250101]
-    // Array syntax uses brackets: TD=[2,3] not (TD=2 OR TD=3)
-    
     const parts = [];
 
-    // Date filter — published since cutoff (YYYYMMDD format)
-    parts.push(`PD>=[${cutoff}]`);
+    // Date filter — published since cutoff (NO brackets - simple comparison)
+    parts.push(`PD>=${cutoff}`);
     
-    // Notice type: contract notices only (TD=[2,3] format)
-    parts.push(`TD=[${CONTRACT_NOTICE_TYPES.join(',')}]`);
-    
-    log.info(`DEBUG: Minimal query - date + notice type only (cutoff: ${cutoff})`);
+    log.info(`DEBUG: Minimal query - ONLY date filter (cutoff: ${cutoff})`);
     
     /*
+    // Notice type: contract notices only (TD=2 OR TD=3)
+    const tdFilter = CONTRACT_NOTICE_TYPES.map(t => `TD=${t}`).join(' OR ');
+    parts.push(`(${tdFilter})`);
+
     // Country filter
     if (countries.length > 0) {
-        const cyList = countries.map(c => c.toUpperCase()).join(',');
-        parts.push(`CY=[${cyList}]`);
+        const cyFilter = countries.map(c => `CY=${c.toUpperCase()}`).join(' OR ');
+        parts.push(`(${cyFilter})`);
     }
 
     // CPV code filter
     if (cpvCodes.length > 0) {
-        const pcList = cpvCodes.join(',');
-        parts.push(`PC=[${pcList}]`);
+        const pcFilter = cpvCodes.map(c => `PC=${c}`).join(' OR ');
+        parts.push(`(${pcFilter})`);
     }
 
     // Keyword filter — search in title
